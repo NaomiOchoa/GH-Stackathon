@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { auth } from "../firebase";
 import {
   Header,
@@ -15,6 +15,7 @@ import {
   Statistic,
 } from "semantic-ui-react";
 import Timer from "./Timer";
+import { firestore } from "../firebase";
 
 export default class UserHome extends React.Component {
   constructor(props) {
@@ -23,10 +24,35 @@ export default class UserHome extends React.Component {
       user: this.props.user,
       open: false,
       activeMenuItem: "0",
+      newTask: "",
+      tasks: this.props.tasks,
     };
     this.toggleDrawerState = this.toggleDrawerState.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
+    this.addTask = this.addTask.bind(this);
+    this.handleChange = this.handleChange.bind(this);
   }
+
+  get userRef() {
+    return firestore.doc(`users/${this.state.user.uid}`);
+  }
+
+  get taskRef() {
+    return this.userRef.collection("tasks");
+  }
+
+  componentDidMount = async () => {
+    this.unsubscribeFromTasks = this.taskRef.onSnapshot((snapshot) => {
+      const tasks = snapshot.docs.map((doc) => {
+        return { id: doc.id, ...doc.data() };
+      });
+      this.setState({ tasks });
+    });
+  };
+
+  componentWillUnmount = () => {
+    this.unsubscribeFromTasks();
+  };
 
   toggleDrawerState() {
     if (this.state.open) {
@@ -39,6 +65,20 @@ export default class UserHome extends React.Component {
   handleMenuItemClick(e, { name }) {
     console.log(name);
     this.setState({ activeMenuItem: name });
+  }
+
+  addTask() {
+    console.log(this.userRef);
+    try {
+      this.taskRef.add({ taskName: this.state.newTask });
+    } catch (error) {
+      console.error(error);
+    }
+    this.setState({ newTask: "" });
+  }
+
+  handleChange(e) {
+    this.setState({ [e.target.name]: e.target.value });
   }
 
   render() {
@@ -78,7 +118,19 @@ export default class UserHome extends React.Component {
           </Tab.Pane>
         ),
       },
-      { menuItem: "Stats", render: () => <Tab.Pane>Tab 2 Content</Tab.Pane> },
+      {
+        menuItem: "Stats",
+        render: () => (
+          <Tab.Pane>
+            <Grid divided="vertically">
+              <Grid.Row>Today</Grid.Row>
+              <Grid.Row>This Week</Grid.Row>
+              <Grid.Row>This Month</Grid.Row>
+              <Grid.Row>This Year</Grid.Row>
+            </Grid>
+          </Tab.Pane>
+        ),
+      },
     ];
 
     return (
@@ -105,45 +157,37 @@ export default class UserHome extends React.Component {
                 Today
               </Header>
               <Segment className="task-segment">
-                <Menu vertical color="olive" fluid>
+                <Menu vertical color="green" fluid>
                   <Menu.Item
                     name="a"
                     active={activeMenuItem === "a"}
                     onClick={this.handleMenuItemClick}
                   />
                 </Menu>
-                <Menu vertical color="olive" fluid>
+                <Menu vertical color="green" fluid>
                   <Menu.Item
                     name="b"
                     active={activeMenuItem === "b"}
                     onClick={this.handleMenuItemClick}
                   />
                 </Menu>
-                <Menu vertical color="olive" fluid>
+                <Menu vertical color="green" fluid>
                   <Menu.Item
                     name="c"
                     active={activeMenuItem === "c"}
                     onClick={this.handleMenuItemClick}
                   />
                 </Menu>
-                <Input fluid action="Add" placeholder="new task"></Input>
+                <Input
+                  fluid
+                  action={<Button onClick={this.addTask}>Add</Button>}
+                  placeholder="New Task"
+                  name="newTask"
+                  onChange={this.handleChange}
+                  value={this.state.newTask}
+                ></Input>
               </Segment>
               <Timer />
-              {/* <Input
-                className="reminder-interval"
-                placeholder="Reminder Interval"
-                label="minutes"
-                labelPosition="right"
-              />
-              <Input
-                className="break-interval"
-                placeholder="Break Length"
-                label="minutes"
-                labelPosition="right"
-              />
-              <Button className="start-button">Start!</Button>
-              <Button className="break-button">Take a break</Button>
-              <Button className="done-button">Done for today!</Button> */}
             </div>
           </Sidebar.Pusher>
         </Sidebar.Pushable>

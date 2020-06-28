@@ -21,8 +21,8 @@ export default class Timer extends React.Component {
     this.state = {
       reminderTimerMin: "",
       reminderTimerSec: "",
-      breakTimerMin: 0,
-      breakTimerSec: 0,
+      breakTimerMin: "",
+      breakTimerSec: "",
       runningTimerMin: 0,
       runningTimerSec: 0,
       isRunning: false,
@@ -100,7 +100,7 @@ export default class Timer extends React.Component {
       setTimerMin,
     } = this.state;
     return (
-      <div>
+      <React.Fragment>
         <Input
           className="reminder-interval"
           placeholder="Reminder Interval"
@@ -119,6 +119,15 @@ export default class Timer extends React.Component {
           value={breakTimerMin}
           onChange={this.handleChange}
         />
+        <Input
+          className="running-total"
+          placeholder="Time Spent"
+          label="spent"
+          labelPosition="right"
+          name="runningTotal"
+          disabled
+          value={`${runningTimerMin}:${runningTimerSec}`}
+        />
         <Button className="start-button" onClick={this.startTaskTimer}>
           {isRunning ? `${reminderTimerMin}:${reminderTimerSec}` : "Start!"}
         </Button>
@@ -128,8 +137,8 @@ export default class Timer extends React.Component {
         <Button className="break-button">
           {isRunning ? `${breakTimerMin}:${breakTimerSec}` : "Take a Break"}
         </Button>
-        <div>{`${runningTimerMin}:${runningTimerSec}`}</div>
-      </div>
+        {/* <div>{`${runningTimerMin}:${runningTimerSec}`}</div> */}
+      </React.Fragment>
     );
   }
 }

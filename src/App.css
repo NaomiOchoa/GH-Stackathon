@@ -77,6 +77,11 @@
   grid-column: 3/4;
 }
 
+.running-total {
+  grid-row: 4/5;
+  grid-column: 4/5;
+}
+
 .start-button {
   grid-row: 5/6;
   grid-column: 2/3;
