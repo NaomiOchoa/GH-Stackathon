@@ -1,21 +1,18 @@
-import React, { useContext } from "react";
-import { auth } from "../firebase";
+import React from "react";
 import {
   Header,
-  Icon,
-  Image,
   Menu,
   Segment,
   Sidebar,
   Button,
   Tab,
   Grid,
-  List,
   Input,
-  Statistic,
 } from "semantic-ui-react";
 import Timer from "./Timer";
 import { firestore } from "../firebase";
+import AllTasks from "./AllTasks";
+import ActiveTasks from "./ActiveTasks";
 
 export default class UserHome extends React.Component {
   constructor(props) {
@@ -23,14 +20,17 @@ export default class UserHome extends React.Component {
     this.state = {
       user: this.props.user,
       open: false,
-      activeMenuItem: "0",
+      activeMenuItem: "",
       newTask: "",
-      tasks: this.props.tasks,
+      tasks: [],
+      activeTasks: [],
     };
     this.toggleDrawerState = this.toggleDrawerState.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
     this.addTask = this.addTask.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.setTaskAsActive = this.setTaskAsActive.bind(this);
+    this.setTaskAsInactive = this.setTaskAsInactive.bind(this);
   }
 
   get userRef() {
@@ -46,13 +46,41 @@ export default class UserHome extends React.Component {
       const tasks = snapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
+      const activeTasks = tasks.filter((task) => task.active);
       this.setState({ tasks });
+      this.setState({ activeTasks });
     });
   };
 
   componentWillUnmount = () => {
     this.unsubscribeFromTasks();
   };
+
+  addTask() {
+    console.log(this.userRef);
+    try {
+      this.taskRef.add({ taskName: this.state.newTask, active: true });
+    } catch (error) {
+      console.error(error);
+    }
+    this.setState({ newTask: "" });
+  }
+
+  setTaskAsActive(id) {
+    try {
+      this.taskRef.doc(`/${id}`).update({ active: true });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  setTaskAsInactive(id) {
+    try {
+      this.taskRef.doc(`/${id}`).update({ active: false });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   toggleDrawerState() {
     if (this.state.open) {
@@ -67,54 +95,24 @@ export default class UserHome extends React.Component {
     this.setState({ activeMenuItem: name });
   }
 
-  addTask() {
-    console.log(this.userRef);
-    try {
-      this.taskRef.add({ taskName: this.state.newTask });
-    } catch (error) {
-      console.error(error);
-    }
-    this.setState({ newTask: "" });
-  }
-
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
 
   render() {
-    const { open, user, activeMenuItem } = this.state;
-    console.log(this.state);
+    const { open, activeMenuItem, tasks, activeTasks } = this.state;
+    console.log("tasks", this.state.tasks);
+    console.log("activeTasks", this.state.activeTasks);
     const panes = [
       {
         menuItem: "Tasks",
         render: () => (
           <Tab.Pane>
-            <Grid divided="vertically">
-              <Grid.Row verticalAlign="center" columns={3}>
-                <Grid.Column textAlign="left" floated="left">
-                  Task Name
-                </Grid.Column>
-                <Grid.Column textAlign="right" floated="right">
-                  <Button size="mini">Add to Today</Button>
-                </Grid.Column>
-              </Grid.Row>
-              <Grid.Row verticalAlign="center" columns={3}>
-                <Grid.Column textAlign="left" floated="left">
-                  Task Name
-                </Grid.Column>
-                <Grid.Column textAlign="right" floated="right">
-                  <Button size="mini">Add to Today</Button>
-                </Grid.Column>
-              </Grid.Row>
-              <Grid.Row verticalAlign="center" columns={3}>
-                <Grid.Column textAlign="left" floated="left">
-                  Task Name
-                </Grid.Column>
-                <Grid.Column textAlign="right" floated="right">
-                  <Button size="mini">Add to Today</Button>
-                </Grid.Column>
-              </Grid.Row>
-            </Grid>
+            <AllTasks
+              tasks={tasks}
+              setTaskAsInactive={this.setTaskAsInactive}
+              setTaskAsActive={this.setTaskAsActive}
+            />
           </Tab.Pane>
         ),
       },
@@ -157,7 +155,12 @@ export default class UserHome extends React.Component {
                 Today
               </Header>
               <Segment className="task-segment">
-                <Menu vertical color="green" fluid>
+                <ActiveTasks
+                  activeTasks={activeTasks}
+                  activeMenuItem={activeMenuItem}
+                  handleMenuItemClick={this.handleMenuItemClick}
+                />
+                {/* <Menu vertical color="green" fluid>
                   <Menu.Item
                     name="a"
                     active={activeMenuItem === "a"}
@@ -177,7 +180,7 @@ export default class UserHome extends React.Component {
                     active={activeMenuItem === "c"}
                     onClick={this.handleMenuItemClick}
                   />
-                </Menu>
+                </Menu> */}
                 <Input
                   fluid
                   action={<Button onClick={this.addTask}>Add</Button>}
@@ -185,7 +188,7 @@ export default class UserHome extends React.Component {
                   name="newTask"
                   onChange={this.handleChange}
                   value={this.state.newTask}
-                ></Input>
+                />
               </Segment>
               <Timer />
             </div>

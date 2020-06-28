@@ -1,19 +1,6 @@
 import React from "react";
 
-import {
-  Header,
-  Icon,
-  Image,
-  Menu,
-  Segment,
-  Sidebar,
-  Button,
-  Tab,
-  Grid,
-  List,
-  Input,
-  Statistic,
-} from "semantic-ui-react";
+import { Button, Input } from "semantic-ui-react";
 
 export default class Timer extends React.Component {
   constructor() {
