@@ -22,17 +22,16 @@ export const provider = new firebase.auth.GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {
   try {
-    const { credential, user } = await firebase
-      .auth()
-      .signInWithPopup(provider);
+    const { user } = await firebase.auth().signInWithPopup(provider);
     console.log(user);
   } catch (error) {
-    var errorCode = error.code;
-    var errorMessage = error.message;
-    // The email of the user's account used.
-    var email = error.email;
-    // The firebase.auth.AuthCredential type that was used.
-    var credential = error.credential;
+    // var errorCode = error.code;
+    // var errorMessage = error.message;
+    // // The email of the user's account used.
+    // var email = error.email;
+    // // The firebase.auth.AuthCredential type that was used.
+    // var credential = error.credential;
+    console.error(error);
     // ...
   }
 };
