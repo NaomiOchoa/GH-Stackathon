@@ -3,8 +3,8 @@ import React from "react";
 import { Button, Input } from "semantic-ui-react";
 
 export default class Timer extends React.Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
     this.state = {
       reminderTimerMin: "",
       reminderTimerSec: "",
@@ -65,7 +65,9 @@ export default class Timer extends React.Component {
   }
 
   stopTimer() {
-    clearInterval(this.state.timerId);
+    const { runningTimerMin, runningTimerSec, timerId } = this.state;
+    clearInterval(timerId);
+    this.props.addTimeEvent(runningTimerMin, runningTimerSec);
     this.setState({
       reminderTimerMin: "",
       reminderTimerSec: "",

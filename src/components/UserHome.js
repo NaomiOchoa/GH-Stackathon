@@ -1,16 +1,16 @@
 import React from "react";
 import {
   Header,
-  Menu,
   Segment,
   Sidebar,
   Button,
   Tab,
   Grid,
   Input,
+  Icon,
 } from "semantic-ui-react";
 import Timer from "./Timer";
-import { firestore } from "../firebase";
+import { auth, firestore } from "../firebase";
 import AllTasks from "./AllTasks";
 import ActiveTasks from "./ActiveTasks";
 
@@ -31,6 +31,7 @@ export default class UserHome extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.setTaskAsActive = this.setTaskAsActive.bind(this);
     this.setTaskAsInactive = this.setTaskAsInactive.bind(this);
+    this.addTimeEvent = this.addTimeEvent.bind(this);
   }
 
   get userRef() {
@@ -57,13 +58,36 @@ export default class UserHome extends React.Component {
   };
 
   addTask() {
-    console.log(this.userRef);
     try {
       this.taskRef.add({ taskName: this.state.newTask, active: true });
     } catch (error) {
       console.error(error);
     }
     this.setState({ newTask: "" });
+  }
+
+  addTimeEvent(min, sec) {
+    try {
+      const addedAt = new Date();
+      const task = this.state.activeMenuItem;
+      let secondsSpent = min * 60 + sec;
+      firestore
+        .doc(
+          `users/${this.state.user.uid}/tasks/${this.state.activeMenuItem.id}`
+        )
+        .collection("timeEvents")
+        .add({
+          addedAt,
+          secondsSpent,
+        });
+      this.userRef.collection("timeEvents").add({
+        addedAt,
+        secondsSpent,
+        task,
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   setTaskAsActive(id) {
@@ -90,9 +114,11 @@ export default class UserHome extends React.Component {
     }
   }
 
-  handleMenuItemClick(e, { name }) {
-    console.log(name);
-    this.setState({ activeMenuItem: name });
+  handleMenuItemClick(e, { value }) {
+    const activeTask = this.state.activeTasks.filter(
+      (task) => task.id === value
+    );
+    this.setState({ activeMenuItem: activeTask[0] });
   }
 
   handleChange(e) {
@@ -100,9 +126,7 @@ export default class UserHome extends React.Component {
   }
 
   render() {
-    const { open, activeMenuItem, tasks, activeTasks } = this.state;
-    console.log("tasks", this.state.tasks);
-    console.log("activeTasks", this.state.activeTasks);
+    const { open, activeMenuItem, tasks, activeTasks, user } = this.state;
     const panes = [
       {
         menuItem: "Tasks",
@@ -144,12 +168,19 @@ export default class UserHome extends React.Component {
           />
           <Sidebar.Pusher>
             <div className="main-wrapper">
-              <nav
-                fixed="top"
-                className="navbar"
-                onClick={this.toggleDrawerState}
-              >
-                Main Menu
+              <nav fixed="top" className="navbar">
+                <Icon
+                  id="menu-control"
+                  name="bars"
+                  onClick={this.toggleDrawerState}
+                />
+                <Header id="page-title">Whatcha Doin'</Header>
+                <div id="user-logout">
+                  <span>{user.displayName}</span>
+                  <Button type="button" onClick={() => auth.signOut()}>
+                    Log Out
+                  </Button>
+                </div>
               </nav>
               <Header as="h1" className="section-title">
                 Today
@@ -160,27 +191,6 @@ export default class UserHome extends React.Component {
                   activeMenuItem={activeMenuItem}
                   handleMenuItemClick={this.handleMenuItemClick}
                 />
-                {/* <Menu vertical color="green" fluid>
-                  <Menu.Item
-                    name="a"
-                    active={activeMenuItem === "a"}
-                    onClick={this.handleMenuItemClick}
-                  />
-                </Menu>
-                <Menu vertical color="green" fluid>
-                  <Menu.Item
-                    name="b"
-                    active={activeMenuItem === "b"}
-                    onClick={this.handleMenuItemClick}
-                  />
-                </Menu>
-                <Menu vertical color="green" fluid>
-                  <Menu.Item
-                    name="c"
-                    active={activeMenuItem === "c"}
-                    onClick={this.handleMenuItemClick}
-                  />
-                </Menu> */}
                 <Input
                   fluid
                   action={<Button onClick={this.addTask}>Add</Button>}
@@ -190,8 +200,9 @@ export default class UserHome extends React.Component {
                   value={this.state.newTask}
                 />
               </Segment>
-              <Timer />
+              <Timer addTimeEvent={this.addTimeEvent} />
             </div>
+            <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" />
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>

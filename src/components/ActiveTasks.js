@@ -8,10 +8,11 @@ export default function ActiveTasks(props) {
     <React.Fragment>
       {activeTasks.map((task) => {
         return (
-          <Menu vertical color="green" fluid>
+          <Menu key={task.id} vertical color="green" fluid>
             <Menu.Item
               name={task.taskName}
-              active={activeMenuItem === task.taskName}
+              value={task.id}
+              active={activeMenuItem.id === task.id}
               onClick={handleMenuItemClick}
             />
           </Menu>
