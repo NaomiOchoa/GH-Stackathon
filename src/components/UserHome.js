@@ -202,7 +202,7 @@ export default class UserHome extends React.Component {
               </Segment>
               <Timer addTimeEvent={this.addTimeEvent} />
             </div>
-            <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" />
+            {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
           </Sidebar.Pusher>
         </Sidebar.Pushable>
       </div>
