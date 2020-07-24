@@ -115,10 +115,12 @@ export default class Timer extends React.Component {
           labelPosition="right"
           name="runningTotal"
           disabled
-          value={`${runningTimerMin}:${runningTimerSec}`}
+          value={`${runningTimerMin}:${("0" + runningTimerSec).slice(-2)}`}
         />
         <Button className="start-button" onClick={this.startTaskTimer}>
-          {isRunning ? `${reminderTimerMin}:${reminderTimerSec}` : "Start!"}
+          {isRunning
+            ? `${reminderTimerMin}:${("0" + reminderTimerSec).slice(-2)}`
+            : "Start!"}
         </Button>
         <Button className="done-button" onClick={this.stopTimer}>
           Done with this task for now!
