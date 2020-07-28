@@ -13,6 +13,7 @@ import Timer from "./Timer";
 import { auth, firestore } from "../firebase";
 import AllTasks from "./AllTasks";
 import ActiveTasks from "./ActiveTasks";
+import TimeVisuals from "./TimeVisuals";
 
 export default class UserHome extends React.Component {
   constructor(props) {
@@ -185,7 +186,7 @@ export default class UserHome extends React.Component {
               <Header as="h1" className="section-title">
                 Today
               </Header>
-              <Segment className="task-segment">
+              {/* <Segment className="task-segment">
                 <ActiveTasks
                   activeTasks={activeTasks}
                   activeMenuItem={activeMenuItem}
@@ -200,7 +201,8 @@ export default class UserHome extends React.Component {
                   value={this.state.newTask}
                 />
               </Segment>
-              <Timer addTimeEvent={this.addTimeEvent} />
+              <Timer addTimeEvent={this.addTimeEvent} /> */}
+              <TimeVisuals />
             </div>
             {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
           </Sidebar.Pusher>
