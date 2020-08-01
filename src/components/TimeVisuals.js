@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { auth, firestore } from "../firebase";
+import moment from "moment";
 import * as d3 from "d3";
 const width = 650;
 const height = 400;
@@ -29,6 +31,25 @@ export default function TimeVisuals(props) {
       taskName: "My New Task 3",
     },
   ];
+
+  useEffect(() => {
+    async function fetchData() {
+      let dataArray = [];
+      let todayRef = firestore.doc(
+        `users/${props.userId}/activeDates/${props.time}`
+      );
+      const tasks = await todayRef.collection("dateTasks").get();
+      tasks.forEach((doc) => {
+        const data = doc.data();
+        dataArray.push({
+          seconds: data.secondsSpent,
+          taskName: data.taskName,
+        });
+      });
+      setData(dataArray);
+    }
+    fetchData();
+  }, [props.userId, props.time]);
 
   const [data, setData] = React.useState(fakeData1);
 
@@ -92,7 +113,15 @@ export default function TimeVisuals(props) {
 
   return (
     <div>
-      <button onClick={() => setData(fakeData2)}>Change to Fake 2 </button>
+      <button
+        onClick={() =>
+          data[0].taskName === "My New Task"
+            ? setData(fakeData2)
+            : setData(fakeData1)
+        }
+      >
+        Change Data
+      </button>
       <svg
         width={width}
         height={height}

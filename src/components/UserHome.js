@@ -14,6 +14,8 @@ import { auth, firestore } from "../firebase";
 import AllTasks from "./AllTasks";
 import ActiveTasks from "./ActiveTasks";
 import TimeVisuals from "./TimeVisuals";
+// import moment from "moment-timezone";
+import moment from "moment";
 
 export default class UserHome extends React.Component {
   constructor(props) {
@@ -67,24 +69,49 @@ export default class UserHome extends React.Component {
     this.setState({ newTask: "" });
   }
 
-  addTimeEvent(min, sec) {
+  async addTimeEvent(min, sec) {
     try {
       const addedAt = new Date();
+      const today = moment().format("M D YYYY");
+      console.log(today);
       const task = this.state.activeMenuItem;
       let secondsSpent = min * 60 + sec;
-      firestore
-        .doc(
-          `users/${this.state.user.uid}/tasks/${this.state.activeMenuItem.id}`
-        )
-        .collection("timeEvents")
-        .add({
-          addedAt,
-          secondsSpent,
-        });
-      this.userRef.collection("timeEvents").add({
-        addedAt,
-        secondsSpent,
-        task,
+      // firestore
+      //   .doc(
+      //     `users/${this.state.user.uid}/tasks/${this.state.activeMenuItem.id}`
+      //   )
+      //   .collection("timeEvents")
+      //   .add({
+      //     addedAt,
+      //     secondsSpent,
+      //   });
+      // this.userRef.collection("timeEvents").add({
+
+      // });
+
+      const todayRef = this.userRef.collection("activeDates").doc(today);
+      const todayTaskRef = todayRef.collection("dateTasks").doc(task.id);
+      const doc = await todayTaskRef.get();
+      if (!doc.exists) {
+        todayTaskRef.set(
+          {
+            taskName: task.taskName,
+            secondsSpent,
+          },
+          { merge: true }
+        );
+      } else {
+        const prevTime = doc.data().secondsSpent;
+        todayTaskRef.set(
+          {
+            secondsSpent: prevTime + secondsSpent,
+          },
+          { merge: true }
+        );
+      }
+      const status = await todayRef.collection("dateTasks").get();
+      status.forEach((doc) => {
+        console.log(doc.data());
       });
     } catch (error) {
       console.error(error);
@@ -202,7 +229,10 @@ export default class UserHome extends React.Component {
                 />
               </Segment>
               <Timer addTimeEvent={this.addTimeEvent} /> */}
-              <TimeVisuals />
+              <TimeVisuals
+                userId={this.state.user.uid}
+                time={moment().format("M D YYYY")}
+              />
             </div>
             {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
           </Sidebar.Pusher>
