@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import { auth, firestore } from "../firebase";
+import { firestore } from "../firebase";
+import { Header, Button } from "semantic-ui-react";
 import moment from "moment";
 import * as d3 from "d3";
 const width = 650;
@@ -10,34 +11,13 @@ export default function TimeVisuals(props) {
   const chartRef = React.createRef();
   const xAxisRef = React.createRef();
   const yAxisRef = React.createRef();
-
-  const fakeData1 = [
-    {
-      date: new Date(1 / 1 / 2020),
-      seconds: 123,
-      taskName: "My New Task",
-    },
-  ];
-
-  const fakeData2 = [
-    {
-      date: new Date(1 / 1 / 2020),
-      seconds: 50,
-      taskName: "My New Task 2",
-    },
-    {
-      date: new Date(1 / 1 / 2020),
-      seconds: 500,
-      taskName: "My New Task 3",
-    },
-  ];
+  const [time, setTime] = React.useState(props.time);
+  const [data, setData] = React.useState([]);
 
   useEffect(() => {
     async function fetchData() {
       let dataArray = [];
-      let todayRef = firestore.doc(
-        `users/${props.userId}/activeDates/${props.time}`
-      );
+      let todayRef = firestore.doc(`users/${props.userId}/activeDates/${time}`);
       const tasks = await todayRef.collection("dateTasks").get();
       tasks.forEach((doc) => {
         const data = doc.data();
@@ -49,9 +29,8 @@ export default function TimeVisuals(props) {
       setData(dataArray);
     }
     fetchData();
-  }, [props.userId, props.time]);
-
-  const [data, setData] = React.useState(fakeData1);
+    console.log(data);
+  }, [props.userId, time]);
 
   function update(data) {
     const svg = d3.select(chartRef.current);
@@ -111,31 +90,32 @@ export default function TimeVisuals(props) {
     update(data);
   }, [data]);
 
+  function decreaseDay() {
+    let newDate = moment(time, "M D YYYY")
+      .subtract(1, "days")
+      .format("M D YYYY");
+    setTime(newDate);
+  }
+
+  function increaseDay() {
+    let newDate = moment(time, "M D YYYY").add(1, "days").format("M D YYYY");
+    setTime(newDate);
+  }
+
   return (
-    <div>
-      <button
-        onClick={() =>
-          data[0].taskName === "My New Task"
-            ? setData(fakeData2)
-            : setData(fakeData1)
-        }
-      >
-        Change Data
-      </button>
-      <svg
-        width={width}
-        height={height}
-        // width={width + margin.left + margin.right}
-        // height={height + margin.top + margin.bottom}
-        ref={chartRef}
-        // transform={`translate(${margin.left}, ${margin.top})`}
-      >
+    <React.Fragment>
+      <Header as="h1" className="section-title">
+        <Button basic icon="angle left" onClick={decreaseDay} />
+        {moment(time, "M D YYYY").format("MMM Do, YYYY")}
+        <Button basic icon="angle right" onClick={increaseDay} />
+      </Header>
+      <svg width={width} height={height} ref={chartRef}>
         <g
           ref={xAxisRef}
           transform={`translate(0, ${height - margin.bottom})`}
         />
         <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
       </svg>
-    </div>
+    </React.Fragment>
   );
 }

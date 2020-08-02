@@ -11,9 +11,11 @@ import {
 } from "semantic-ui-react";
 import Timer from "./Timer";
 import { auth, firestore } from "../firebase";
+import PrimaryNav from "./PrimaryNav";
 import AllTasks from "./AllTasks";
 import ActiveTasks from "./ActiveTasks";
-import TimeVisuals from "./TimeVisuals";
+import TimeVisualsView from "./TimeVisualsView";
+import TimeTrackingView from "./TimeTrackingView";
 // import moment from "moment-timezone";
 import moment from "moment";
 
@@ -27,6 +29,7 @@ export default class UserHome extends React.Component {
       newTask: "",
       tasks: [],
       activeTasks: [],
+      view: "tasks",
     };
     this.toggleDrawerState = this.toggleDrawerState.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
@@ -173,10 +176,13 @@ export default class UserHome extends React.Component {
         render: () => (
           <Tab.Pane>
             <Grid divided="vertically">
-              <Grid.Row>Today</Grid.Row>
-              <Grid.Row>This Week</Grid.Row>
-              <Grid.Row>This Month</Grid.Row>
-              <Grid.Row>This Year</Grid.Row>
+              <Grid.Row
+                onClick={() => {
+                  this.setState({ view: "stats" });
+                }}
+              >
+                Daily
+              </Grid.Row>
             </Grid>
           </Tab.Pane>
         ),
@@ -210,29 +216,22 @@ export default class UserHome extends React.Component {
                   </Button>
                 </div>
               </nav>
-              <Header as="h1" className="section-title">
-                Today
-              </Header>
-              {/* <Segment className="task-segment">
-                <ActiveTasks
+              {this.state.view === "tasks" ? (
+                <TimeTrackingView
                   activeTasks={activeTasks}
                   activeMenuItem={activeMenuItem}
                   handleMenuItemClick={this.handleMenuItemClick}
+                  addTask={this.addTask}
+                  handleChange={this.handleChange}
+                  newTask={this.state.newTask}
+                  addTimeEvent={this.addTimeEvent}
                 />
-                <Input
-                  fluid
-                  action={<Button onClick={this.addTask}>Add</Button>}
-                  placeholder="New Task"
-                  name="newTask"
-                  onChange={this.handleChange}
-                  value={this.state.newTask}
+              ) : (
+                <TimeVisualsView
+                  userId={this.state.user.uid}
+                  time={moment().format("M D YYYY")}
                 />
-              </Segment>
-              <Timer addTimeEvent={this.addTimeEvent} /> */}
-              <TimeVisuals
-                userId={this.state.user.uid}
-                time={moment().format("M D YYYY")}
-              />
+              )}
             </div>
             {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
           </Sidebar.Pusher>
