@@ -1,9 +1,18 @@
 import React, { useContext } from "react";
 import { firestore } from "../firebase";
 
-import { Header, Segment, Button, Input } from "semantic-ui-react";
+import {
+  Header,
+  Segment,
+  Button,
+  Input,
+  Grid,
+  Divider,
+  Icon,
+} from "semantic-ui-react";
 import Timer from "./Timer";
 import ActiveTasks from "./ActiveTasks";
+import AllTaskSearch from "./AllTaskSearch";
 import { TasksContext } from "../providers/TasksProvider";
 import moment from "moment";
 
@@ -23,6 +32,14 @@ export default function TimeTrackingView(props) {
       console.error(error);
     }
     setNewTask("");
+  }
+
+  function setTaskAsActive(id) {
+    try {
+      taskRef.doc(`/${id}`).update({ active: true });
+    } catch (error) {
+      console.error(error);
+    }
   }
 
   function setTaskAsInactive(id) {
@@ -76,14 +93,37 @@ export default function TimeTrackingView(props) {
           handleMenuItemClick={setActiveMenuItem}
           setTaskAsInactive={setTaskAsInactive}
         />
-        <Input
-          fluid
-          action={<Button onClick={addTask}>Add</Button>}
-          placeholder="New Task"
-          name="newTask"
-          onChange={(e) => setNewTask(e.target.value)}
-          value={newTask}
-        />
+        <Segment placeholder>
+          <Grid columns={2} stackable textAlign="center">
+            <Divider vertical>Or</Divider>
+
+            <Grid.Row verticalAlign="middle">
+              <Grid.Column>
+                <Header icon>
+                  <Icon name="search" />
+                  Add Existing Task
+                </Header>
+
+                <AllTaskSearch setTaskAsActive={setTaskAsActive} />
+              </Grid.Column>
+
+              <Grid.Column>
+                <Header icon>
+                  <Icon name="tasks" />
+                  Add New Task
+                </Header>
+                <Input
+                  fluid
+                  action={<Button onClick={addTask}>Add</Button>}
+                  placeholder="Add new task..."
+                  name="newTask"
+                  onChange={(e) => setNewTask(e.target.value)}
+                  value={newTask}
+                />
+              </Grid.Column>
+            </Grid.Row>
+          </Grid>
+        </Segment>
       </Segment>
       <Timer addTimeEvent={addTimeEvent} />
     </React.Fragment>

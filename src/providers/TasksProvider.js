@@ -6,7 +6,7 @@ export const TasksContext = createContext();
 class TasksProvider extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { tasks: [], activeTasks: [] };
+    this.state = { tasks: [], activeTasks: [], inactiveTasks: [] };
   }
 
   get userRef() {
@@ -25,8 +25,10 @@ class TasksProvider extends React.Component {
         return { id: doc.id, ...doc.data() };
       });
       const activeTasks = tasks.filter((task) => task.active);
+      const inactiveTasks = tasks.filter((task) => !task.active);
       this.setState({ tasks });
       this.setState({ activeTasks });
+      this.setState({ inactiveTasks });
     });
   };
 
@@ -35,11 +37,11 @@ class TasksProvider extends React.Component {
   };
 
   render() {
-    const { tasks, activeTasks } = this.state;
+    const { tasks, activeTasks, inactiveTasks } = this.state;
     const { children } = this.props;
 
     return (
-      <TasksContext.Provider value={{ tasks, activeTasks }}>
+      <TasksContext.Provider value={{ tasks, activeTasks, inactiveTasks }}>
         {children}
       </TasksContext.Provider>
     );
