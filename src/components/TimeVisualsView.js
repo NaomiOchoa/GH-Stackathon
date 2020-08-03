@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { firestore } from "../firebase";
-import { Header, Button } from "semantic-ui-react";
+import { Header, Button, Grid, Menu } from "semantic-ui-react";
 import moment from "moment";
 import * as d3 from "d3";
 const width = 650;
@@ -13,8 +13,10 @@ export default function TimeVisuals(props) {
   const yAxisRef = React.createRef();
   const [time, setTime] = React.useState(props.time);
   const [data, setData] = React.useState([]);
+  const [view, setView] = React.useState("daily");
 
   useEffect(() => {
+    console.log("fetching data");
     async function fetchData() {
       let dataArray = [];
       let todayRef = firestore.doc(`users/${props.userId}/activeDates/${time}`);
@@ -29,7 +31,6 @@ export default function TimeVisuals(props) {
       setData(dataArray);
     }
     fetchData();
-    console.log(data);
   }, [props.userId, time]);
 
   function update(data) {
@@ -86,7 +87,6 @@ export default function TimeVisuals(props) {
   }
 
   useEffect(() => {
-    console.log("calling update useEffect");
     update(data);
   }, [data]);
 
@@ -103,19 +103,49 @@ export default function TimeVisuals(props) {
   }
 
   return (
-    <React.Fragment>
-      <Header as="h1" className="section-title">
-        <Button basic icon="angle left" onClick={decreaseDay} />
-        {moment(time, "M D YYYY").format("MMM Do, YYYY")}
-        <Button basic icon="angle right" onClick={increaseDay} />
-      </Header>
-      <svg width={width} height={height} ref={chartRef}>
-        <g
-          ref={xAxisRef}
-          transform={`translate(0, ${height - margin.bottom})`}
-        />
-        <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
-      </svg>
-    </React.Fragment>
+    <Grid>
+      <Grid.Column stretched width={2}>
+        <Menu fluid vertical tabular>
+          <Menu.Item
+            name="Daily"
+            active={view === "daily"}
+            onClick={() => {
+              setView("daily");
+            }}
+          />
+          <Menu.Item
+            name="Weekly"
+            active={view === "weekly"}
+            onClick={() => setView("weekly")}
+          />
+          <Menu.Item
+            name="Monthly"
+            active={view === "monthly"}
+            onClick={() => setView("monthly")}
+          />
+          <Menu.Item
+            name="Yearly"
+            active={view === "yearly"}
+            onClick={() => setView("yearly")}
+          />
+        </Menu>
+      </Grid.Column>
+      <Grid.Column stretched width={12}>
+        <React.Fragment>
+          <Header as="h1" className="section-title">
+            <Button basic icon="angle left" onClick={decreaseDay} />
+            {moment(time, "M D YYYY").format("MMM Do, YYYY")}
+            <Button basic icon="angle right" onClick={increaseDay} />
+          </Header>
+          <svg width={width} height={height} ref={chartRef}>
+            <g
+              ref={xAxisRef}
+              transform={`translate(0, ${height - margin.bottom})`}
+            />
+            <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
+          </svg>
+        </React.Fragment>
+      </Grid.Column>
+    </Grid>
   );
 }

@@ -1,17 +1,16 @@
-import React, { createContext, useContext } from "react";
+import React, { createContext } from "react";
 import { firestore } from "../firebase";
-import { UserContext } from "./UserProvider";
 
 export const TasksContext = createContext();
 
 class TasksProvider extends React.Component {
-  constructor() {
-    super();
-    this.state = { tasks: [] };
+  constructor(props) {
+    super(props);
+    this.state = { tasks: [], activeTasks: [] };
   }
 
   get userRef() {
-    return firestore.doc(`users/${this.state.user.id}`);
+    return firestore.doc(`users/${this.props.user.uid}`);
   }
 
   get taskRef() {
@@ -25,7 +24,9 @@ class TasksProvider extends React.Component {
       const tasks = snapshot.docs.map((doc) => {
         return { id: doc.id, ...doc.data() };
       });
+      const activeTasks = tasks.filter((task) => task.active);
       this.setState({ tasks });
+      this.setState({ activeTasks });
     });
   };
 
@@ -34,11 +35,13 @@ class TasksProvider extends React.Component {
   };
 
   render() {
-    const { tasks } = this.state;
+    const { tasks, activeTasks } = this.state;
     const { children } = this.props;
 
     return (
-      <TasksContext.Provider value={tasks}>{children}</TasksContext.Provider>
+      <TasksContext.Provider value={{ tasks, activeTasks }}>
+        {children}
+      </TasksContext.Provider>
     );
   }
 }

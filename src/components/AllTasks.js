@@ -1,8 +1,30 @@
-import React from "react";
+import React, { useContext } from "react";
+import { firestore } from "../firebase";
 import { Button, Grid } from "semantic-ui-react";
+import { TasksContext } from "../providers/TasksProvider";
 
 export default function AllTasks(props) {
-  const { tasks, setTaskAsActive, setTaskAsInactive } = props;
+  const { tasks } = useContext(TasksContext);
+  const { user } = props;
+
+  const userRef = firestore.doc(`users/${user.uid}`);
+  const taskRef = userRef.collection("tasks");
+
+  function setTaskAsActive(id) {
+    try {
+      taskRef.doc(`/${id}`).update({ active: true });
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  function setTaskAsInactive(id) {
+    try {
+      taskRef.doc(`/${id}`).update({ active: false });
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   return (
     <Grid divided="vertically">

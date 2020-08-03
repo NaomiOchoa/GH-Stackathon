@@ -191,18 +191,9 @@ export default class UserHome extends React.Component {
 
     return (
       <div id="full-content">
-        <Sidebar.Pushable>
-          <Sidebar
-            animation="push"
-            onHide={() => this.toggleDrawerState}
-            visible={open}
-            width="wide"
-            as={Tab}
-            panes={panes}
-          />
-          <Sidebar.Pusher>
-            <div className="main-wrapper">
-              <nav fixed="top" className="navbar">
+        {/* <PrimaryNav user={user} /> */}
+        <div className="main-wrapper">
+          {/* <nav fixed="top" className="navbar">
                 <Icon
                   id="menu-control"
                   name="bars"
@@ -215,27 +206,25 @@ export default class UserHome extends React.Component {
                     Log Out
                   </Button>
                 </div>
-              </nav>
-              {this.state.view === "tasks" ? (
-                <TimeTrackingView
-                  activeTasks={activeTasks}
-                  activeMenuItem={activeMenuItem}
-                  handleMenuItemClick={this.handleMenuItemClick}
-                  addTask={this.addTask}
-                  handleChange={this.handleChange}
-                  newTask={this.state.newTask}
-                  addTimeEvent={this.addTimeEvent}
-                />
-              ) : (
-                <TimeVisualsView
-                  userId={this.state.user.uid}
-                  time={moment().format("M D YYYY")}
-                />
-              )}
-            </div>
-            {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
-          </Sidebar.Pusher>
-        </Sidebar.Pushable>
+              </nav> */}
+
+          {this.state.view === "tasks" ? (
+            <TimeTrackingView
+              activeTasks={activeTasks}
+              activeMenuItem={activeMenuItem}
+              handleMenuItemClick={this.handleMenuItemClick}
+              addTask={this.addTask}
+              handleChange={this.handleChange}
+              newTask={this.state.newTask}
+              addTimeEvent={this.addTimeEvent}
+            />
+          ) : (
+            <TimeVisualsView
+              userId={this.state.user.uid}
+              time={moment().format("M D YYYY")}
+            />
+          )}
+        </div>
       </div>
     );
   }
