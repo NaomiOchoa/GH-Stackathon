@@ -11,8 +11,13 @@ import {
 } from "semantic-ui-react";
 import Timer from "./Timer";
 import { auth, firestore } from "../firebase";
+import PrimaryNav from "./PrimaryNav";
 import AllTasks from "./AllTasks";
 import ActiveTasks from "./ActiveTasks";
+import TimeVisualsView from "./TimeVisualsView";
+import TimeTrackingView from "./TimeTrackingView";
+// import moment from "moment-timezone";
+import moment from "moment";
 
 export default class UserHome extends React.Component {
   constructor(props) {
@@ -24,6 +29,7 @@ export default class UserHome extends React.Component {
       newTask: "",
       tasks: [],
       activeTasks: [],
+      view: "tasks",
     };
     this.toggleDrawerState = this.toggleDrawerState.bind(this);
     this.handleMenuItemClick = this.handleMenuItemClick.bind(this);
@@ -66,24 +72,49 @@ export default class UserHome extends React.Component {
     this.setState({ newTask: "" });
   }
 
-  addTimeEvent(min, sec) {
+  async addTimeEvent(min, sec) {
     try {
       const addedAt = new Date();
+      const today = moment().format("M D YYYY");
+      console.log(today);
       const task = this.state.activeMenuItem;
       let secondsSpent = min * 60 + sec;
-      firestore
-        .doc(
-          `users/${this.state.user.uid}/tasks/${this.state.activeMenuItem.id}`
-        )
-        .collection("timeEvents")
-        .add({
-          addedAt,
-          secondsSpent,
-        });
-      this.userRef.collection("timeEvents").add({
-        addedAt,
-        secondsSpent,
-        task,
+      // firestore
+      //   .doc(
+      //     `users/${this.state.user.uid}/tasks/${this.state.activeMenuItem.id}`
+      //   )
+      //   .collection("timeEvents")
+      //   .add({
+      //     addedAt,
+      //     secondsSpent,
+      //   });
+      // this.userRef.collection("timeEvents").add({
+
+      // });
+
+      const todayRef = this.userRef.collection("activeDates").doc(today);
+      const todayTaskRef = todayRef.collection("dateTasks").doc(task.id);
+      const doc = await todayTaskRef.get();
+      if (!doc.exists) {
+        todayTaskRef.set(
+          {
+            taskName: task.taskName,
+            secondsSpent,
+          },
+          { merge: true }
+        );
+      } else {
+        const prevTime = doc.data().secondsSpent;
+        todayTaskRef.set(
+          {
+            secondsSpent: prevTime + secondsSpent,
+          },
+          { merge: true }
+        );
+      }
+      const status = await todayRef.collection("dateTasks").get();
+      status.forEach((doc) => {
+        console.log(doc.data());
       });
     } catch (error) {
       console.error(error);
@@ -145,10 +176,13 @@ export default class UserHome extends React.Component {
         render: () => (
           <Tab.Pane>
             <Grid divided="vertically">
-              <Grid.Row>Today</Grid.Row>
-              <Grid.Row>This Week</Grid.Row>
-              <Grid.Row>This Month</Grid.Row>
-              <Grid.Row>This Year</Grid.Row>
+              <Grid.Row
+                onClick={() => {
+                  this.setState({ view: "stats" });
+                }}
+              >
+                Daily
+              </Grid.Row>
             </Grid>
           </Tab.Pane>
         ),
@@ -157,18 +191,9 @@ export default class UserHome extends React.Component {
 
     return (
       <div id="full-content">
-        <Sidebar.Pushable>
-          <Sidebar
-            animation="push"
-            onHide={() => this.toggleDrawerState}
-            visible={open}
-            width="wide"
-            as={Tab}
-            panes={panes}
-          />
-          <Sidebar.Pusher>
-            <div className="main-wrapper">
-              <nav fixed="top" className="navbar">
+        {/* <PrimaryNav user={user} /> */}
+        <div className="main-wrapper">
+          {/* <nav fixed="top" className="navbar">
                 <Icon
                   id="menu-control"
                   name="bars"
@@ -181,30 +206,25 @@ export default class UserHome extends React.Component {
                     Log Out
                   </Button>
                 </div>
-              </nav>
-              <Header as="h1" className="section-title">
-                Today
-              </Header>
-              <Segment className="task-segment">
-                <ActiveTasks
-                  activeTasks={activeTasks}
-                  activeMenuItem={activeMenuItem}
-                  handleMenuItemClick={this.handleMenuItemClick}
-                />
-                <Input
-                  fluid
-                  action={<Button onClick={this.addTask}>Add</Button>}
-                  placeholder="New Task"
-                  name="newTask"
-                  onChange={this.handleChange}
-                  value={this.state.newTask}
-                />
-              </Segment>
-              <Timer addTimeEvent={this.addTimeEvent} />
-            </div>
-            {/* <img src="Blinking-Cat-Gif.gif" alt="a blinking cat" /> */}
-          </Sidebar.Pusher>
-        </Sidebar.Pushable>
+              </nav> */}
+
+          {this.state.view === "tasks" ? (
+            <TimeTrackingView
+              activeTasks={activeTasks}
+              activeMenuItem={activeMenuItem}
+              handleMenuItemClick={this.handleMenuItemClick}
+              addTask={this.addTask}
+              handleChange={this.handleChange}
+              newTask={this.state.newTask}
+              addTimeEvent={this.addTimeEvent}
+            />
+          ) : (
+            <TimeVisualsView
+              userId={this.state.user.uid}
+              time={moment().format("M D YYYY")}
+            />
+          )}
+        </div>
       </div>
     );
   }

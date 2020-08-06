@@ -1,12 +1,12 @@
 import React from "react";
 
-import { Button, Input } from "semantic-ui-react";
+import { Button, Input, Grid, Segment } from "semantic-ui-react";
 
 export default class Timer extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      reminderTimerMin: "",
+      reminderTimerMin: 30,
       reminderTimerSec: "",
       breakTimerMin: "",
       breakTimerSec: "",
@@ -81,55 +81,79 @@ export default class Timer extends React.Component {
     const {
       reminderTimerMin,
       reminderTimerSec,
-      breakTimerMin,
-      breakTimerSec,
       runningTimerMin,
       runningTimerSec,
       isRunning,
       setTimerMin,
     } = this.state;
+    const { activeMenuItem } = this.props;
     return (
-      <React.Fragment>
-        <Input
-          className="reminder-interval"
-          placeholder="Reminder Interval"
-          label="minutes"
-          labelPosition="right"
-          name="reminderTimerMin"
-          value={isRunning ? setTimerMin : reminderTimerMin}
-          onChange={this.handleChange}
-        />
-        <Input
-          className="break-interval"
-          placeholder="Break Length"
-          label="minutes"
-          labelPosition="right"
-          name="breakTimerMin"
-          value={breakTimerMin}
-          onChange={this.handleChange}
-        />
-        <Input
-          className="running-total"
-          placeholder="Time Spent"
-          label="spent"
-          labelPosition="right"
-          name="runningTotal"
-          disabled
-          value={`${runningTimerMin}:${("0" + runningTimerSec).slice(-2)}`}
-        />
-        <Button className="start-button" onClick={this.startTaskTimer}>
-          {isRunning
-            ? `${reminderTimerMin}:${("0" + reminderTimerSec).slice(-2)}`
-            : "Start!"}
-        </Button>
-        <Button className="done-button" onClick={this.stopTimer}>
-          Done with this task for now!
-        </Button>
-        <Button className="break-button">
-          {isRunning ? `${breakTimerMin}:${breakTimerSec}` : "Take a Break"}
-        </Button>
-        {/* <div>{`${runningTimerMin}:${runningTimerSec}`}</div> */}
-      </React.Fragment>
+      <Segment>
+        <Grid stackable columns={2}>
+          <Grid.Row>
+            <Grid.Column>
+              <Grid.Row>
+                <Input
+                  className="reminder-interval"
+                  placeholder="Reminder Interval"
+                  label="minutes"
+                  labelPosition="right"
+                  name="reminderTimerMin"
+                  disabled
+                  value={
+                    isRunning ? `${setTimerMin}:00` : `${reminderTimerMin}:00`
+                  }
+                />
+              </Grid.Row>
+              <Grid.Row>
+                <input
+                  type="range"
+                  min={0}
+                  max={60}
+                  name="reminderTimerMin"
+                  value={reminderTimerMin}
+                  onChange={this.handleChange}
+                />
+              </Grid.Row>
+            </Grid.Column>
+            <Grid.Column>
+              <Input
+                className="running-total"
+                placeholder="Time Spent"
+                label="spent"
+                labelPosition="right"
+                name="runningTotal"
+                disabled
+                value={`${runningTimerMin}:${("00" + runningTimerSec).slice(
+                  -2
+                )}`}
+              />
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column>
+              <Button
+                className="start-button"
+                disabled={!activeMenuItem}
+                onClick={this.startTaskTimer}
+              >
+                {isRunning
+                  ? `${reminderTimerMin}:${("00" + reminderTimerSec).slice(-2)}`
+                  : "Start!"}
+              </Button>
+            </Grid.Column>
+            <Grid.Column>
+              <Button
+                className="done-button"
+                disabled={!isRunning}
+                onClick={this.stopTimer}
+              >
+                Done with this task for now!
+              </Button>
+            </Grid.Column>
+          </Grid.Row>
+        </Grid>
+      </Segment>
     );
   }
 }
