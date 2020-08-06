@@ -9,14 +9,11 @@ WhatchaDoin' is designed to provide friendly reminders to when you're trying to 
 
 - Forgetting to stop a timer when you're done working on a task
 - Forgetting to start a new timer when you switch tasks
-- Forgetting to restart your timer after taking a break
 - etc...
 
-WhatchaDoin' will also summarize your time data, making it easy to input into a company system if necessary.
+WhatchaDoin' also summarizes your time data, making it easy to see where you've spent the most time.
 
-WhatchaDoin' is still a work in progress. Up next:
-
-- Data visualization with D3.js: See your time data summarized in a variety of ways (by day, week, task, etc.)
+WhatchaDoin' is still a work in progress. You can check out the current state of the app here: https://wd-time-tracker.web.app/
 
 ## Install
 
@@ -28,12 +25,6 @@ After cloning, run npm install
 
 ```sh
 Run npm run start and navigate to http://localhost:3000
-```
-
-## Run tests
-
-```sh
-npm run test
 ```
 
 ## Author
