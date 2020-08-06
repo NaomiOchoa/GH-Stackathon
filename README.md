@@ -27,11 +27,12 @@ After cloning, run npm install
 Run npm run start and navigate to http://localhost:3000
 ```
 
+<!--
 ## Run tests
 
 ```sh
 npm run test
-```
+``` -->
 
 ## Author
 
