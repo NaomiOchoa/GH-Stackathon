@@ -93,7 +93,7 @@ export default function TimeTrackingView(props) {
           handleMenuItemClick={setActiveMenuItem}
           setTaskAsInactive={setTaskAsInactive}
         />
-        <Segment placeholder>
+        <Segment>
           <Grid columns={2} stackable textAlign="center">
             <Divider vertical>Or</Divider>
 
@@ -124,8 +124,8 @@ export default function TimeTrackingView(props) {
             </Grid.Row>
           </Grid>
         </Segment>
+        <Timer addTimeEvent={addTimeEvent} activeMenuItem={activeMenuItem} />
       </Segment>
-      <Timer addTimeEvent={addTimeEvent} />
     </React.Fragment>
   );
 }

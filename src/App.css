@@ -120,3 +120,16 @@
   grid-row: 5/6;
   grid-column: 4/5;
 }
+
+#svg-container {
+  margin: 3em;
+}
+
+#time-control-container {
+  display: flex;
+  justify-content: center;
+}
+
+.ui.button.time-control-button {
+  margin: 2em 1em 2em 1em;
+}

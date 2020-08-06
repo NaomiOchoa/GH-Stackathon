@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { firestore } from "../firebase";
-import { Header, Button, Grid, Menu } from "semantic-ui-react";
+import { Header, Button, Grid, Menu, Icon } from "semantic-ui-react";
 import moment from "moment";
 import * as d3 from "d3";
 const width = 650;
@@ -116,27 +116,41 @@ export default function TimeVisuals(props) {
           <Menu.Item
             name="Weekly"
             active={view === "weekly"}
+            disabled
             onClick={() => setView("weekly")}
           />
           <Menu.Item
             name="Monthly"
             active={view === "monthly"}
+            disabled
             onClick={() => setView("monthly")}
           />
           <Menu.Item
             name="Yearly"
             active={view === "yearly"}
+            disabled
             onClick={() => setView("yearly")}
           />
         </Menu>
       </Grid.Column>
-      <Grid.Column stretched width={12}>
-        <React.Fragment>
+      <Grid.Column stretched centered width={14}>
+        <Grid.Row id="time-control-container">
+          <Button
+            icon="angle left"
+            onClick={decreaseDay}
+            className="time-control-button"
+          />
           <Header as="h1" className="section-title">
-            <Button basic icon="angle left" onClick={decreaseDay} />
             {moment(time, "M D YYYY").format("MMM Do, YYYY")}
-            <Button basic icon="angle right" onClick={increaseDay} />
+            <Header.Subheader>Seconds Spent per Task</Header.Subheader>
           </Header>
+          <Button
+            icon="angle right"
+            onClick={increaseDay}
+            className="time-control-button"
+          />
+        </Grid.Row>
+        <div id="svg-container">
           <svg width={width} height={height} ref={chartRef}>
             <g
               ref={xAxisRef}
@@ -144,7 +158,7 @@ export default function TimeVisuals(props) {
             />
             <g ref={yAxisRef} transform={`translate(${margin.left}, 0)`} />
           </svg>
-        </React.Fragment>
+        </div>
       </Grid.Column>
     </Grid>
   );
