@@ -7,6 +7,7 @@ import {
   Typography,
   Container,
 } from "@material-ui/core";
+import Blinky from "./Blinky";
 
 import { signInWithGoogle, auth, createUserProfileDoc } from "../firebase";
 
@@ -52,60 +53,68 @@ export default class LoginSignupForm extends React.Component {
   render() {
     const { displayName, email, password, form } = this.state;
     return form === "login" ? (
-      <Container component="main" maxWidth="sm">
-        <Paper>
-          <Typography component="h1" varient="h5">
-            Sign In
-          </Typography>
-          <form onSubmit={this.handleUserPasswordLogin}>
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="email"
-              label="Email Address"
-              name="email"
-              autoComplete="email"
-              autoFocus
-              value={email}
-              onChange={this.handleChange}
-            />
-            <TextField
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              id="password"
-              label="Password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              value={password}
-              onChange={this.handleChange}
-            />
-            <Button type="submit" fullWidth variant="contained" color="primary">
+      <React.Fragment>
+        <Container component="main" maxWidth="sm">
+          <Paper>
+            <Typography component="h1" varient="h5">
               Sign In
+            </Typography>
+            <form onSubmit={this.handleUserPasswordLogin}>
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="email"
+                label="Email Address"
+                name="email"
+                autoComplete="email"
+                autoFocus
+                value={email}
+                onChange={this.handleChange}
+              />
+              <TextField
+                variant="outlined"
+                margin="normal"
+                required
+                fullWidth
+                id="password"
+                label="Password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                value={password}
+                onChange={this.handleChange}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                color="primary"
+              >
+                Sign In
+              </Button>
+            </form>
+            <Button
+              type="button"
+              fullWidth
+              variant="contained"
+              color="primary"
+              onClick={signInWithGoogle}
+            >
+              Sign In With Google
             </Button>
-          </form>
-          <Button
-            type="button"
-            fullWidth
-            variant="contained"
-            color="primary"
-            onClick={signInWithGoogle}
-          >
-            Sign In With Google
-          </Button>
-          <Link
-            href="#"
-            variant="body2"
-            onClick={() => this.setState({ form: "signup" })}
-          >
-            {"Don't have an account? Sign Up"}
-          </Link>
-        </Paper>
-      </Container>
+            <Link
+              href="#"
+              variant="body2"
+              onClick={() => this.setState({ form: "signup" })}
+            >
+              {"Don't have an account? Sign Up"}
+            </Link>
+          </Paper>
+        </Container>
+        <Blinky />
+      </React.Fragment>
     ) : (
       <Container component="main" maxWidth="sm">
         <Paper>
