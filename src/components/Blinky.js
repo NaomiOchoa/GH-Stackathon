@@ -1,9 +1,109 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { gsap } from "gsap";
 
 export default function Blinky() {
+  const tl = React.useRef(
+    gsap.timeline({ repeat: -1, repeatDelay: 2, yoyo: true })
+  );
+
+  useEffect(() => {
+    gsap.set("#LeftEar", {
+      transformOrigin: "50% 80%",
+    });
+    gsap.set("#RightEar", {
+      transformOrigin: "50% 80%",
+    });
+
+    tl.current.from("#Head, #Body", {
+      duration: 1,
+      y: 250,
+      ease: "Back.easeInOut",
+    });
+    tl.current.to("#Eyes, #Pupils", {
+      duration: 0.07,
+      scaleY: 0.01,
+      transformOrigin: "50% 70%",
+      ease: "Sine.easeOut",
+    });
+    tl.current.to("#Eyes, #Pupils", {
+      duration: 0.07,
+      scaleY: 1,
+      transformOrigin: "50% 70%",
+      ease: "Sine.easeOut",
+    });
+    tl.current.to(
+      "#Eyes, #Pupils",
+      {
+        duration: 0.07,
+        scaleY: 0.01,
+        transformOrigin: "50% 70%",
+        ease: "Sine.easeOut",
+      },
+      "+=.5"
+    );
+    tl.current.to("#Eyes, #Pupils", {
+      duration: 0.07,
+      scaleY: 1,
+      transformOrigin: "50% 70%",
+      ease: "Sine.easeOut",
+    });
+    tl.current.to(
+      "#Head",
+      {
+        duration: 0.5,
+        rotation: -8,
+        transformOrigin: "50% 70%",
+        ease: "Sine.easeInOut",
+      },
+      "+=1"
+    );
+    tl.current.addLabel("earStart");
+    tl.current.to(
+      "#LeftEar",
+
+      {
+        duration: 0.2,
+        rotation: -8,
+        ease: "Sine.easeInOut",
+      },
+      "earStart"
+    );
+    tl.current.to(
+      "#RightEar",
+
+      {
+        duration: 0.2,
+        rotation: 8,
+        ease: "Sine.easeInOut",
+      },
+      "earStart"
+    );
+    tl.current.addLabel("earStart2");
+    // tl.current.to(
+    //   "#LeftEar",
+
+    //   {
+    //     duration: 0.2,
+    //     rotation: 8,
+    //     ease: "Sine.easeInOut",
+    //   },
+    //   "earStart2"
+    // );
+    // tl.current.to(
+    //   "#RightEar",
+
+    //   {
+    //     duration: 0.2,
+    //     rotation: -8,
+    //     ease: "Sine.easeInOut",
+    //   },
+    //   "earStart2"
+    // );
+  }, []);
+
   return (
     <div id="blinky">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 363.36 400.72">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -20 363.36 400.72">
         <g id="Body">
           <path
             d="M513.5,1048.15c-14.63-47.67,2.71-109.62,20-142.89,42.15-81.08,132-84,180-8,21.35,33.83,45.53,100.89,31,150.92C715.91,1146.6,545.34,1151.93,513.5,1048.15Z"
