@@ -138,12 +138,18 @@
 
 svg {
   margin: 5vmin 5vmin 0vmin 5vmin;
-  width: 60vw;
-  height: 60vh;
+  width: 40vw;
+  height: 40vh;
 }
 
 #blinky {
   position: absolute;
   bottom: 0px;
   width: 100%;
+  z-index: -1;
+}
+
+h1.ui.header.site-title {
+  font-family: "Chango", "Lato", "Helvetica Neue", Arial, Helvetica, sans-serif;
+  font-size: 3rem;
 }
